@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="my-4">Habits Analysis</h1>
+    <!-- Dropdown for selecting period -->
+    <div class="mb-4">
+        <select class="form-select" onchange="showHabits(this.value)">
+            <option value="all">All tracked habits</option>
+            <option value="completed">Completed habits</option>
+            <option value="daily">Daily habits</option>
+            <option value="weekly">Weekly habits</option>
+            <option value="monthly">Monthly habits</option>
+            <option value="d-struggled-most">Daily Habit struggled most last month</option>
+            <option value="w-struggled-most">Weekly Habit struggled most last month</option>
+            <option value="longest-streak">Longest run streak over all defined habits</option>
+            <option value="longest-current-streak">Longest current streak over all defined habits</option>
+            <option value="habit-longest-streak">Longest Streak for Habit:</option>
+        </select>
+    </div>
+
+    <!-- Dropdown for selecting habit (hidden by default) -->
+    <div id="habit-dropdown" class="mb-4 d-none">
+        <select class="form-select" id="habit-select">
+            <option value="" selected disabled>Choose a habit</option>
+            {% for habit in all_habits %}
+                <option value="{{ habit.id }}">{{ habit.name }} ({{ habit.period }})</option>
+            {% endfor %}
+        </select>
+    </div>
+      
+    <div class="container">
+        <div class="row">
+            <div class="col-md-11">
+                <!-- Display All Habits -->
+                <div id="all-active-habits">
+                    <div class="row">
+                        {% for habit in all_habits %}
+                            {% include 'analysis_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Daily Habits -->
+                <div id="daily-active-habits" style="display: none;">
+                    <div class="row">
+                        {% for habit in daily_habits %}
+                            {% include 'analysis_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Weekly Habits -->
+                <div id="weekly-active-habits" style="display: none;">
+                    <div class="row">
+                        {% for habit in weekly_habits %}
+                            {% include 'analysis_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Monthly Habits -->
+                <div id="monthly-active-habits" style="display: none;">
+                    <div class="row">
+                        {% for habit in monthly_habits %}
+                            {% include 'analysis_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Most Struggled Daily Habit -->
+                <div id="d-struggled-most-active-habits" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card streak-card">
+                                <div class="card-body d-flex flex-column">
+                                    {% if daily_struggled_most %}
+                                        <h4 class="card-title">{{ daily_struggled_most.0.0.name }}</h4>
+                                        {% with streak=daily_struggled_most.0.0.streak.first %}
+                                            <div class="streak-info">
+                                                <div class="streak-label">Failed Tasks</div>
+                                                <div class="streak-value">
+                                                    {% if streak and streak.num_of_failed_tasks %}
+                                                        {{ streak.num_of_failed_tasks }}
+                                                    {% else %}
+                                                        0
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="streak-info">
+                                                <div class="streak-label">Longest Streak</div>
+                                                <div class="streak-value">
+                                                    {% if streak %}
+                                                        {{ streak.longest_streak }}
+                                                    {% else %}
+                                                        0
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endwith %}
+                                        {% with habit=daily_struggled_most.0.0 %}
+                                            <a class="btn btn-text btn-block mt-1" href="{% url 'habit_detail' habit_id=habit.id %}">More Details</a>
+                                        {% endwith %}   
+                                    {% else %}
+                                        <p>No daily struggled habit available.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <!-- Display Most Struggled Weekly Habit -->
+                <div id="w-struggled-most-active-habits" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card streak-card">
+                                <div class="card-body d-flex flex-column">
+                                    {% if weekly_struggled_most and weekly_struggled_most|length > 0 %}
+                                        <h4 class="card-title">{{ weekly_struggled_most.0.0.name }}</h4>
+                                        {% with streak=weekly_struggled_most.0.0.streak.first %}
+                                            <div class="streak-info">
+                                                <div class="streak-label">Failed Tasks</div>
+                                                <div class="streak-value">
+                                                    {% if streak and streak.num_of_failed_tasks %}
+                                                        {{ streak.num_of_failed_tasks }}
+                                                    {% else %}
+                                                        0
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="streak-info">
+                                                <div class="streak-label">Longest Streak</div>
+                                                <div class="streak-value">
+                                                    {% if streak %}
+                                                        {{ streak.longest_streak }}
+                                                    {% else %}
+                                                        0
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endwith %}
+                                        {% with habit=weekly_struggled_most.0.0 %}
+                                            <a class="btn btn-text btn-block mt-1" href="{% url 'habit_detail' habit_id=habit.id %}">More Details</a>
+                                        {% endwith %}                                
+                                    {% else %}
+                                        <p>No weekly struggled habit available.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                <!-- Display Longest Streak -->
+                <div id="longest-streak-active-habits" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card streak-card">
+                                <div class="card-body d-flex flex-column">
+                                    {% if longest_all_streak %}
+                                        {% for habit in longest_all_streak %}
+                                        <h4 class="card-title">{{ habit.name.capitalize }}</h4>
+                                            {% with streak=habit.streak.first %}
+                                                <div class="streak-info">
+                                                    <div class="streak-label">Current Streak</div>
+                                                    <div class="streak-value">{{ streak.current_streak }}</div>
+                                                </div>
+                                                <div class="streak-info">
+                                                    <div class="streak-label">Longest Streak</div>
+                                                    <div class="streak-value">{{ streak.longest_streak }}</div>
+                                                </div>
+                                            {% endwith %}
+                                            <a class="btn btn-text btn-block mt-1" href="{% url 'habit_detail' habit_id=habit.id %}">More Details</a>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>No streak data available.</p>
+                                    {% endif %}             
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Display Longest Current Streak -->
+                <div id="longest-current-streak-active-habits" style="display: none;">
+                    <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card streak-card">
+                                    <div class="card-body d-flex flex-column">
+                                        {% if longest_current_all_streak %}
+                                            {% for habit in longest_current_all_streak %}
+                                                <h4 class="card-title" >{{ habit.name }}</h4>
+                                                    {% with streak=habit.streak.first %}
+                                                        <div class="streak-info">
+                                                            <div class="streak-label">Current Streak</div>
+                                                            <div class="streak-value">{{ streak.current_streak }}</div>
+                                                        </div>
+                                                        <div class="streak-info">
+                                                            <div class="streak-label">Longest Streak</div>
+                                                            <div class="streak-value">{{ streak.longest_streak }}</div>
+                                                        </div>
+                                                    {% endwith %}
+                                                <a class="btn btn-text btn-block mt-1" href="{% url 'habit_detail' habit_id=habit.id %}">More Details</a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>No streak data available.</p>
+                                        {% endif %}  
+                                    </div>  
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div id="completed-active-habits" style="display: none;">
+                <div class="row">
+                    {% for habit in completed_habits %}
+                        {% with streak=habit.streak.first %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card completed-card">
+                                <div class="card-body d-flex flex-column">
+                                    <h4 class="card-title">{{ habit.name }}</h4>
+                                    <h6 class="card-subtitle text-muted text-center">{{ habit.period.capitalize }} Habit</h6>
+                                    <div class="completed-info-line">
+                                        <div class="completed-info-column">
+                                            <div class="completed-label">Total Tasks</div>
+                                            <div class="completed-value">{{ habit.num_of_tasks }}</div> 
+                                            <div class="completed-label">Completed</div>
+                                            <div class="completed-value">{{ streak.num_of_completed_tasks }}</div> 
+                                        </div>
+                                        <div class="vertical-line"></div>
+                                        <div class="completed-info-column">
+                                            <div class="completed-label">Top Streak</div>
+                                            <div class="completed-value">{{ streak.longest_streak }}</div>
+                                            <div class="completed-label">Failed</div>
+                                            <div class="completed-value">{{ streak.num_of_failed_tasks }}</div> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="btn btn-text btn-block mt-1" href="{% url 'habit_detail' habit_id=habit.id %}">More Details</a>
+                            </div>
+                        </div>
+                        {% endwith %}
+                    {% endfor %}
+                </div>                               
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-11">
+                <!-- Habit Cards -->
+                <div id="habit-cards">
+                    <div class="row">
+                        <!-- Habit cards will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var habitSelect = document.getElementById('habit-select');
+            if (habitSelect) {
+                habitSelect.addEventListener('change', function() {
+                    var selectedValue = this.value;
+                    console.log("Selected habit ID:", selectedValue);
+
+                    // If the placeholder option is selected, do nothing
+                    if (!selectedValue) {
+                        console.log("No habit selected.");
+                        return;
+                    }
+
+                    // Send an AJAX request to retrieve data
+                    $.ajax({
+                        url: '',
+                        method: 'POST',
+                        data: {
+                            selectedValue: selectedValue,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(data) {
+                            console.log("Data retrieved:", data);
+
+                            if (data && data.streak && data.streak.length > 0) {
+                                var habitContainer = document.getElementById('habit-cards');
+                                habitContainer.innerHTML = ''; 
+                                // Display data on card
+                                var card = document.createElement('div');
+                                card.classList.add('col-md-6', 'mb-4');
+                                card.innerHTML = `
+                                    <div class="card streak-card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">${data.name}</h4>
+                                            <div class="streak-info">
+                                                <div class="streak-label">Current Streak</div>
+                                                <div class="streak-value">${data.streak[0].current_streak}</div>
+                                            </div>
+                                            <div class="streak-info">
+                                                <div class="streak-label">Longest Streak</div>
+                                                <div class="streak-value">${data.streak[0].longest_streak}</div>
+                                            </div>
+                                            <a class="btn btn-text btn-block mt-1" href="/Habit-Infos/${selectedValue}/">More Details</a>
+                                        </div>
+                                    </div>
+                                `;
+                                habitContainer.appendChild(card);
+                            } else {
+                                console.error("Invalid data format or empty streak array:", data);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error:", error);
+                        }
+                    });
+                });
+            }
+
+            var habitDropdown = document.getElementById('habit-dropdown');
+            if (habitDropdown) {
+                habitDropdown.classList.remove('d-none');
+            }
+        });
+
+        function showHabits(period) {
+            if (period === 'habit-longest-streak') {
+                document.getElementById('habit-dropdown').classList.remove('d-none');
+                document.getElementById('habit-cards').classList.remove('d-none');
+            } else {
+                document.getElementById('habit-dropdown').classList.add('d-none');
+                document.getElementById('habit-cards').classList.add('d-none');
+            }
+
+            // Hide all habit sections
+            var sections = [
+                'all-active-habits', 'daily-active-habits', 'weekly-active-habits',
+                'monthly-active-habits', 'd-struggled-most-active-habits',
+                'w-struggled-most-active-habits', 'longest-streak-active-habits',
+                'longest-current-streak-active-habits', 'completed-active-habits'
+            ];
+            
+            sections.forEach(function(section) {
+                document.getElementById(section).style.display = 'none';
+            });
+
+            // Show the selected habit section
+            var selectedSection = document.getElementById(`${period}-active-habits`);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+        }
+
+    </script>
+{% endblock %}

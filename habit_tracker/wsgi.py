@@ -1,5 +1,5 @@
 """
-WSGI config for habit_tracker project.
+WSGI config for habit_project project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'habit_tracker.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Habit_Tracker.settings')
 
 application = get_wsgi_application()

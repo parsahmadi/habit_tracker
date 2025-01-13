@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card add-habit-card">
+                <h2 class="card-header text-center">Create a New Habit</h2>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="habitSelect" class="col-sm-3 col-form-label text-right">Select Habit:</label>
+                        <div class="col-sm-9">
+                            <select id="habitSelect" onchange="populateForm()" class="form-control">
+                                <option value="">Choose Predefined Habits</option>
+                                {% for habit, details in pre_defined_habits.items %}
+                                    <option value="{{ habit }}">{{ habit }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Custom creation prompt -->
+                    <div class="form-group row">
+                        <div class="col-sm-9 offset-sm-3">
+                            <h5 class="text-start custom-create-habit-text">Or Custom Create a New Habit</h5>
+                        </div>
+                    </div>
+                    
+
+                    <!-- Form starts here -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label for="{{ form.name.id_for_label }}" class="col-sm-3 col-form-label text-right">Name:</label>
+                            <div class="col-sm-9">
+                                {{ form.name }}
+                                {% for error in form.name.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="{{ form.frequency.id_for_label }}" class="col-sm-3 col-form-label text-right">Frequency:</label>
+                            <div class="col-sm-9">
+                                {{ form.frequency }}
+                                {% for error in form.frequency.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label for="{{ form.period.id_for_label }}" class="col-sm-3 col-form-label text-right">Period:</label>
+                            <div class="col-sm-9">
+                                {{ form.period }}
+                                {% for error in form.period.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="{{ form.goal.id_for_label }}" class="col-sm-3 col-form-label text-right">Goal:</label>
+                            <div class="col-sm-9">
+                                {{ form.goal }}
+                                {% for error in form.goal.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label for="{{ form.start_date.id_for_label }}" class="col-sm-3 col-form-label text-right">Start Date:</label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    {{ form.start_date }}
+                                </div>
+                            </div>
+                        </div>
+                                             
+                        <div class="form-group row">
+                            <label for="{{ form.notes.id_for_label }}" class="col-sm-3 col-form-label text-right">Notes:</label>
+                            <div class="col-sm-9">
+                                {{ form.notes }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-7 offset-sm-3">
+                                <button type="submit" class="btn btn-primary btn-block">Create Habit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Bootstrap Datepicker with dropdown option
+        $(document).ready(function(){
+            $('#startDateInput').datepicker({
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                container: '#startDateBtn'
+            });
+        });
+    
+        function populateForm() {
+            var select = document.getElementById("habitSelect");
+            var habit = select.options[select.selectedIndex].value;
+            var habitDetails = {{ pre_defined_habits|safe }}[habit];
+            
+            // Set values for form fields
+            document.getElementById("id_name").value = habit;
+            document.getElementById("id_frequency").value = habitDetails.frequency;
+            document.getElementById("id_period").value = habitDetails.period;
+            document.getElementById("id_goal").value = habitDetails.goal;
+            document.getElementById("id_notes").value = habitDetails.notes;
+        }
+    </script>
+    
+{% endblock %}

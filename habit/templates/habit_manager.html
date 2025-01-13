@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="my-4">Habits Manager</h1>
+    <!-- Buttons for Daily, Weekly, Monthly, and All Tasks -->
+    <div class="mb-4">
+        <button id="all-button" class="switcher-button" onclick="showTasks('all')">All</button>
+        <button id="daily-button" class="switcher-button" onclick="showTasks('daily')">Daily</button>
+        <button id="weekly-button" class="switcher-button" onclick="showTasks('weekly')">Weekly</button>
+        <button id="monthly-button" class="switcher-button" onclick="showTasks('monthly')">Monthly</button>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-11">
+                <!-- Display All Habits -->
+                <div id="all-active-habits">
+                    <div class="row">
+                        {% for habit in active_habits %}
+                            {% include 'habit_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Daily Habits -->
+                <div id="daily-active-habits">
+                    <div class="row">
+                        {% for habit in daily_habits %}
+                            {% include 'habit_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Weekly Habits -->
+                <div id="weekly-active-habits">
+                    <div class="row">
+                        {% for habit in weekly_habits %}
+                            {% include 'habit_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Display Monthly Habits -->
+                <div id="monthly-active-habits">
+                    <div class="row">
+                        {% for habit in monthly_habits %}
+                            {% include 'habit_card.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Display all habits by default
+            showTasks('all');
+        });
+
+        function showTasks(period) {
+            // Hide all habit sections
+            document.getElementById('all-active-habits').style.display = 'none';
+            document.getElementById('daily-active-habits').style.display = 'none';
+            document.getElementById('weekly-active-habits').style.display = 'none';
+            document.getElementById('monthly-active-habits').style.display = 'none';
+
+            // Remove 'active' class from all buttons
+            var buttons = document.querySelectorAll('.switcher-button');
+            buttons.forEach(function(button) {
+                button.classList.remove('active');
+            });
+
+            // Show the selected habit section
+            document.getElementById(`${period}-active-habits`).style.display = 'block';
+
+            // Add 'active' class to the clicked button
+            document.getElementById(`${period}-button`).classList.add('active');
+        }
+    </script>
+{% endblock %}
