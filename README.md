@@ -19,9 +19,9 @@ pip install -r requirements.txt
 ```
 
 3. ### Database configuration ###
-```
+
 Ensure you have SQLite installed on your system.
-```
+
 
 
 4. Apply database migrations:
