@@ -130,9 +130,9 @@ class TaskTracker(models.Model):
 
         # Increment the due_date and start_date by time_skip,
         # skip the first iteration for start_date
-        for i in range(n+1, habit.num_of_tasks+(n+1)):
+        for i in range(habit.num_of_tasks):
             due_date += time_skip
-            if i == n+1:
+            if i == 0:
                 current_start_date = start_date
             else:
                 current_start_date += time_skip
