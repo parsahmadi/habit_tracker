@@ -417,6 +417,22 @@ class HabitAnalysis(View):
         calculate_progress(longest_all_streak)
         calculate_progress(longest_current_all_streak)
 
+        labels = []
+        data = []
+        for habit in all_habits:
+            labels.append(habit.name)
+            tasks = TaskTracker.objects.filter(habit_id=habit.id)
+            number_of_completed_tasks = 0
+            number_of_failed_tasks = 0
+            for task in tasks:
+                if task.task_status == 'Completed':
+                    number_of_completed_tasks = number_of_completed_tasks + 1
+                elif task.task_status == 'Failed':
+                    number_of_failed_tasks = number_of_failed_tasks + 1
+            
+            data.append(number_of_completed_tasks / (number_of_completed_tasks + number_of_failed_tasks))
+
+
         context = {
             'all_habits': all_habits,
             'daily_habits': daily_habits,
@@ -426,7 +442,9 @@ class HabitAnalysis(View):
             'weekly_struggled_most' : weekly_struggled_most,
             'longest_all_streak': longest_all_streak,
             'longest_current_all_streak': longest_current_all_streak,
-            'completed_habits': completed_habits
+            'completed_habits': completed_habits,
+            'labels': labels,
+            'data': data
         }
 
         return render(request, 'analysis.html', context)

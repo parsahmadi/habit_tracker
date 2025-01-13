@@ -28,6 +28,7 @@
         </select>
     </div>
       
+    
     <div class="container">
         <div class="row">
             <div class="col-md-11">
@@ -238,6 +239,9 @@
             </div>
         </div>
     </div>
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
     <div class="container">
         <div class="row">
             <div class="col-md-11">
@@ -250,6 +254,9 @@
             </div>
         </div>
     </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -343,6 +350,28 @@
                 selectedSection.style.display = 'block';
             }
         }
+
+
+        const ctx = document.getElementById('myChart');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                labels: {{labels|safe}},
+                datasets: [{
+                    label: 'Success percentage of every habit',
+                    data: {{data|safe}},
+                    borderWidth: 1
+                }]
+                },
+                options: {
+                scales: {
+                    y: {
+                    beginAtZero: true
+                    }
+                }
+                }
+            });
 
     </script>
 {% endblock %}
