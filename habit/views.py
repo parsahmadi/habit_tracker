@@ -324,12 +324,20 @@ class HabitManagerView(View):
         streak = Streak.objects.get(habit_id=habit_id)
         achievement = Achievement.objects.filter(habit_id=habit_id)
         num_inprogress_tasks(habit)
-
+        data = [0, 0, 0]
+        for task in tasks:
+            if task.task_status == 'In progress':
+                data[0] = data[0] + 1
+            elif task.task_status == 'Completed':
+                data[1] = data[1] + 1
+            elif task.task_status == 'Failed':
+                data[2] = data[2] + 1
         context = {
             'habit': habit,
             'tasks': tasks,
             'streak': streak,
-            'achievement' : achievement
+            'achievement' : achievement,
+            'data': data
         }
 
         return render(request, 'habit_details.html', context)
