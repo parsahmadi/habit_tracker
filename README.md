@@ -13,28 +13,31 @@ git clone https://github.com/parsahmadi/habit_tracker.git
 cd habit_tracker
 ```
 
-2. Install dependencies:
+2. after cloning change the habit_tracker folder to Habit_Traker
+
+
+3. Install dependencies:
 ```
 pip install -r requirements.txt
 ```
 
-3. ### Database configuration ###
+4. ### Database configuration ###
 
 Ensure you have SQLite installed on your system.
 
 
 
-4. Apply database migrations:
+5. Apply database migrations:
 ```
 python manage.py migrate
 ```
 
-5. Run the development server:
+6. Run the development server:
 ```
 python manage.py runserver
 ```
 
-6. Access the application in your web browser at [http://localhost:8000](url)
+7. Access the application in your web browser at [http://localhost:8000](url)
 
 # Features #
 ### User Authentication and Registration: ###
